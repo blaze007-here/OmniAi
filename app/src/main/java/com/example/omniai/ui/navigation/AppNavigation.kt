@@ -7,14 +7,18 @@ import androidx.navigation.compose.rememberNavController
 import com.omniai.app.data.supabase.SupabaseService
 import com.omniai.app.ui.screens.auth.LoginScreen
 import com.omniai.app.ui.screens.auth.SignUpScreen
+import com.omniai.app.ui.screens.auth.LoginScreen
+import com.omniai.app.ui.screens.auth.SignUpScreen
 import com.omniai.app.ui.screens.home.HomeScreen
 import com.omniai.app.ui.screens.chat.ChatScreen
+import com.omniai.app.ui.screens.writing.WritingScreen
 
 sealed class Screen(val route: String) {
     object Login : Screen("login")
     object SignUp : Screen("signup")
     object Home : Screen("home")
     object Chat : Screen("chat")
+    object Writing : Screen("writing")
 }
 
 @Composable
@@ -65,12 +69,23 @@ fun AppNavigation() {
                 },
                 onNavigateToChat = {
                     navController.navigate(Screen.Chat.route)
+                },
+                onNavigateToWriting = {
+                    navController.navigate(Screen.Writing.route)
                 }
             )
         }
 
         composable(Screen.Chat.route) {
             ChatScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Screen.Writing.route) {
+            WritingScreen(
                 onNavigateBack = {
                     navController.popBackStack()
                 }
