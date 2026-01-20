@@ -11,7 +11,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 object GeminiService {
-    private const val API_KEY = "AIzaSyAghuA4o5So1QD7nVxMQ9g2Nx4N_OCKyB8" // Replace with your Gemini API key
+    private const val API_KEY = "API" // Replace with your Gemini API key
     // Try the 2.5 version which is now the stable standard in the beta channel
     private const val API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
 

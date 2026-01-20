@@ -24,7 +24,12 @@ data class AIFeature(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(onLogout: () -> Unit, onNavigateToChat: () -> Unit, onNavigateToWriting: () -> Unit) {
+fun HomeScreen(
+    onLogout: () -> Unit,
+    onNavigateToChat: () -> Unit,
+    onNavigateToWriting: () -> Unit,
+    onNavigateToHomework: () -> Unit
+) {
     val scope = rememberCoroutineScope()
     val userEmail = SupabaseService.getCurrentUserEmail()
 
@@ -105,6 +110,7 @@ fun HomeScreen(onLogout: () -> Unit, onNavigateToChat: () -> Unit, onNavigateToW
                         feature = feature,
                         onClick = {
                             when (feature.route) {
+                                "homework" -> onNavigateToHomework()
                                 "chat" -> onNavigateToChat()
                                 "writing" -> onNavigateToWriting()
                                 else -> { /* Other features coming soon */ }
