@@ -28,7 +28,8 @@ fun HomeScreen(
     onLogout: () -> Unit,
     onNavigateToChat: () -> Unit,
     onNavigateToWriting: () -> Unit,
-    onNavigateToHomework: () -> Unit
+    onNavigateToHomework: () -> Unit,
+    onNavigateToArt: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
     val userEmail = SupabaseService.getCurrentUserEmail()
@@ -111,9 +112,10 @@ fun HomeScreen(
                         onClick = {
                             when (feature.route) {
                                 "homework" -> onNavigateToHomework()
-                                "chat" -> onNavigateToChat()
                                 "writing" -> onNavigateToWriting()
-                                else -> { /* Other features coming soon */ }
+                                "chat" -> onNavigateToChat()
+                                "art" -> onNavigateToArt()
+                                else -> { }
                             }
                         }
                     )

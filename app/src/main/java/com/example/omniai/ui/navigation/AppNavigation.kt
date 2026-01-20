@@ -13,6 +13,7 @@ import com.omniai.app.ui.screens.home.HomeScreen
 import com.omniai.app.ui.screens.chat.ChatScreen
 import com.omniai.app.ui.screens.writing.WritingScreen
 import com.omniai.app.ui.screens.homework.HomeworkScreen
+import com.omniai.app.ui.screens.art.ArtScreen
 
 sealed class Screen(val route: String) {
     object Login : Screen("login")
@@ -21,6 +22,7 @@ sealed class Screen(val route: String) {
     object Chat : Screen("chat")
     object Writing : Screen("writing")
     object Homework : Screen("homework")
+    object Art : Screen("art")
 }
 
 @Composable
@@ -77,6 +79,9 @@ fun AppNavigation() {
                 },
                 onNavigateToHomework = {
                     navController.navigate(Screen.Homework.route)
+                },
+                onNavigateToArt = {
+                    navController.navigate(Screen.Art.route)
                 }
             )
         }
@@ -99,6 +104,14 @@ fun AppNavigation() {
 
         composable(Screen.Homework.route) {
             HomeworkScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Screen.Art.route) {
+            ArtScreen(
                 onNavigateBack = {
                     navController.popBackStack()
                 }
