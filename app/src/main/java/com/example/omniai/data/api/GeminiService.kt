@@ -11,7 +11,7 @@ import java.net.URL
 
 object GeminiService {
 
-    //  Supabase Edge Function URL
+    //  Supabase Edge Function URLL
     private const val SUPABASE_FUNCTION_URL =
         "https://lhiziddurpovduccvieb.supabase.co/functions/v1/gemini-chat"
 
