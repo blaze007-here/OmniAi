@@ -9,7 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 object SupabaseService {
-    private const val SUPABASE_URL = "https://lhiziddurpovduccvieb.supabase.co"
+    private const val SUPABASE_URL = "URL"// SUPABASE URL
     private const val SUPABASE_KEY = "API"// supabase api key here or annon keey
 
     val client = createSupabaseClient(
