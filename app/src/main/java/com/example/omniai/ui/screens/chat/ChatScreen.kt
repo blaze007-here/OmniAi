@@ -120,14 +120,19 @@ fun ChatScreen(onNavigateBack: () -> Unit) {
                                     isLoading = true
 
                                     try {
-                                        val response = GeminiService.sendMessage(
-                                            messages = messages.map {
-                                                mapOf(
-                                                    "role" to if (it.isUser) "user" else "assistant",
-                                                    "content" to it.content
-                                                )
+                                        // 🔽 OPTION A CHANGE STARTS HERE
+                                        val conversationPrompt =
+                                            messages.joinToString("\n\n") {
+                                                if (it.isUser) {
+                                                    "User: ${it.content}"
+                                                } else {
+                                                    "Assistant: ${it.content}"
+                                                }
                                             }
-                                        )
+
+                                        val response =
+                                            GeminiService.sendMessage(conversationPrompt)
+                                        // 🔼 OPTION A CHANGE ENDS HERE
 
                                         val aiMessage = Message(
                                             content = response,

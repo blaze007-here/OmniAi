@@ -120,7 +120,7 @@ fun WritingScreen(onNavigateBack: () -> Unit) {
                 )
             }
 
-            // Tone Selector (only shown for Tone mode)
+            // Tone Selector
             if (selectedMode == WritingMode.TONE) {
                 Text(
                     text = "Select Tone",
@@ -184,10 +184,14 @@ fun WritingScreen(onNavigateBack: () -> Unit) {
                         scope.launch {
                             isLoading = true
                             try {
-                                val prompt = buildPrompt(selectedMode, selectedTone, inputText)
-                                val response = GeminiService.sendMessage(
-                                    listOf(mapOf("role" to "user", "content" to prompt))
-                                )
+                                val prompt =
+                                    buildPrompt(selectedMode, selectedTone, inputText)
+
+                                // 🔽 OPTION A CHANGE (STRING PROMPT)
+                                val response =
+                                    GeminiService.sendMessage(prompt)
+                                // 🔼 OPTION A CHANGE
+
                                 outputText = response
                             } catch (e: Exception) {
                                 outputText = "Error: ${e.message}"
@@ -237,12 +241,7 @@ fun WritingScreen(onNavigateBack: () -> Unit) {
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.End
                         ) {
-                            TextButton(
-                                onClick = {
-                                    // Copy to clipboard functionality
-                                    // You can add clipboard manager here
-                                }
-                            ) {
+                            TextButton(onClick = {}) {
                                 Icon(
                                     Icons.Default.ContentCopy,
                                     contentDescription = "Copy",
@@ -297,11 +296,20 @@ fun RowScope.ToneChip(
 
 fun buildPrompt(mode: WritingMode, tone: ToneType, text: String): String {
     return when (mode) {
-        WritingMode.REWRITE -> "Rewrite the following text to make it better while keeping the same meaning:\n\n$text"
-        WritingMode.SUMMARIZE -> "Summarize the following text concisely:\n\n$text"
-        WritingMode.EXPAND -> "Expand the following text with more details and explanations:\n\n$text"
-        WritingMode.GRAMMAR -> "Fix all grammar, spelling, and punctuation errors in the following text. Only return the corrected text:\n\n$text"
-        WritingMode.TONE -> "Rewrite the following text in a ${tone.name.lowercase()} tone:\n\n$text"
+        WritingMode.REWRITE ->
+            "Rewrite the following text to make it better while keeping the same meaning:\n\n$text"
+
+        WritingMode.SUMMARIZE ->
+            "Summarize the following text concisely:\n\n$text"
+
+        WritingMode.EXPAND ->
+            "Expand the following text with more details and explanations:\n\n$text"
+
+        WritingMode.GRAMMAR ->
+            "Fix all grammar, spelling, and punctuation errors in the following text. Only return the corrected text:\n\n$text"
+
+        WritingMode.TONE ->
+            "Rewrite the following text in a ${tone.name.lowercase()} tone:\n\n$text"
     }
 }
 

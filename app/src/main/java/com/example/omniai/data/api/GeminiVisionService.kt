@@ -14,7 +14,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 object GeminiVisionService {
-    private const val API_KEY = "API" // Same as GeminiService
+    private const val API_KEY = "AIzaSyCGlxMOQmMId8gtaKeBAPhl4YAZr80lAuU" // Same as GeminiService
     // Use the stable 2.5 Flash model on the v1beta endpoint
     private const val API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
 
