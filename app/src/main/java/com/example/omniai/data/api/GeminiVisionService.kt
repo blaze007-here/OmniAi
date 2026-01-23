@@ -4,7 +4,6 @@ import android.graphics.Bitmap
 import android.util.Base64
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.json.JSONArray
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.ByteArrayOutputStream
@@ -14,9 +13,13 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 object GeminiVisionService {
-    private const val API_KEY = "AIzaSyCGlxMOQmMId8gtaKeBAPhl4YAZr80lAuU" // Same as GeminiService
-    // Use the stable 2.5 Flash model on the v1beta endpoint
-    private const val API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
+
+    // Supabase Edge Function URL (VISION)
+    private const val SUPABASE_FUNCTION_URL =
+        "https://lhiziddurpovduccvieb.supabase.co/functions/v1/gemini-vision"
+
+    // Supabase anon key (safe to keep in app)
+    private const val SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxoaXppZGR1cnBvdmR1Y2N2aWViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg2NTM1NjIsImV4cCI6MjA4NDIyOTU2Mn0.GLi1wegP8R1vBfcj_K5_-afdsbJHmDJYHVyENMc6Kik"
 
     /**
      * Solve homework problem from an image
@@ -29,69 +32,46 @@ object GeminiVisionService {
     ): String {
         return withContext(Dispatchers.IO) {
             try {
-                // Convert bitmap to base64
                 val base64Image = bitmapToBase64(bitmap)
+                val prompt = buildImagePrompt(subject, additionalContext, showSteps)
 
-                val url = URL("$API_URL?key=$API_KEY")
+                val url = URL(SUPABASE_FUNCTION_URL)
                 val connection = url.openConnection() as HttpURLConnection
 
                 connection.requestMethod = "POST"
                 connection.setRequestProperty("Content-Type", "application/json")
+                connection.setRequestProperty(
+                    "Authorization",
+                    "Bearer $SUPABASE_ANON_KEY"
+                )
+                connection.setRequestProperty("apikey", SUPABASE_ANON_KEY)
                 connection.doOutput = true
                 connection.doInput = true
 
-                // Build prompt
-                val prompt = buildImagePrompt(subject, additionalContext, showSteps)
-
-                // Build request with image
                 val requestBody = JSONObject().apply {
-                    put("contents", JSONArray().apply {
-                        put(JSONObject().apply {
-                            put("parts", JSONArray().apply {
-                                // Add text prompt
-                                put(JSONObject().apply {
-                                    put("text", prompt)
-                                })
-                                // Add image
-                                put(JSONObject().apply {
-                                    put("inline_data", JSONObject().apply {
-                                        put("mime_type", "image/jpeg")
-                                        put("data", base64Image)
-                                    })
-                                })
-                            })
-                        })
-                    })
-                    put("generationConfig", JSONObject().apply {
-                        put("temperature", 0.4)
-                        put("maxOutputTokens", 2048)
-                    })
+                    put("prompt", prompt)
+                    put("imageBase64", base64Image)
                 }
 
-                // Send request
                 val writer = OutputStreamWriter(connection.outputStream)
                 writer.write(requestBody.toString())
                 writer.flush()
                 writer.close()
 
-                // Read response
                 val responseCode = connection.responseCode
 
                 if (responseCode == HttpURLConnection.HTTP_OK) {
-                    val reader = BufferedReader(InputStreamReader(connection.inputStream))
+                    val reader = BufferedReader(
+                        InputStreamReader(connection.inputStream)
+                    )
                     val response = reader.readText()
                     reader.close()
 
-                    // Parse response
-                    val jsonResponse = JSONObject(response)
-                    val candidates = jsonResponse.getJSONArray("candidates")
-                    val content = candidates.getJSONObject(0).getJSONObject("content")
-                    val parts = content.getJSONArray("parts")
-                    val text = parts.getJSONObject(0).getString("text")
-
-                    text
+                    JSONObject(response).getString("text")
                 } else {
-                    val errorReader = BufferedReader(InputStreamReader(connection.errorStream ?: connection.inputStream))
+                    val errorReader = BufferedReader(
+                        InputStreamReader(connection.errorStream ?: connection.inputStream)
+                    )
                     val errorResponse = errorReader.readText()
                     errorReader.close()
 
@@ -115,28 +95,21 @@ object GeminiVisionService {
             try {
                 val prompt = buildTextPrompt(question, subject, showSteps)
 
-                val url = URL("$API_URL?key=$API_KEY")
+                val url = URL(SUPABASE_FUNCTION_URL)
                 val connection = url.openConnection() as HttpURLConnection
 
                 connection.requestMethod = "POST"
                 connection.setRequestProperty("Content-Type", "application/json")
+                connection.setRequestProperty(
+                    "Authorization",
+                    "Bearer $SUPABASE_ANON_KEY"
+                )
+                connection.setRequestProperty("apikey", SUPABASE_ANON_KEY)
                 connection.doOutput = true
                 connection.doInput = true
 
                 val requestBody = JSONObject().apply {
-                    put("contents", JSONArray().apply {
-                        put(JSONObject().apply {
-                            put("parts", JSONArray().apply {
-                                put(JSONObject().apply {
-                                    put("text", prompt)
-                                })
-                            })
-                        })
-                    })
-                    put("generationConfig", JSONObject().apply {
-                        put("temperature", 0.4)
-                        put("maxOutputTokens", 2048)
-                    })
+                    put("prompt", prompt)
                 }
 
                 val writer = OutputStreamWriter(connection.outputStream)
@@ -147,19 +120,17 @@ object GeminiVisionService {
                 val responseCode = connection.responseCode
 
                 if (responseCode == HttpURLConnection.HTTP_OK) {
-                    val reader = BufferedReader(InputStreamReader(connection.inputStream))
+                    val reader = BufferedReader(
+                        InputStreamReader(connection.inputStream)
+                    )
                     val response = reader.readText()
                     reader.close()
 
-                    val jsonResponse = JSONObject(response)
-                    val candidates = jsonResponse.getJSONArray("candidates")
-                    val content = candidates.getJSONObject(0).getJSONObject("content")
-                    val parts = content.getJSONArray("parts")
-                    val text = parts.getJSONObject(0).getString("text")
-
-                    text
+                    JSONObject(response).getString("text")
                 } else {
-                    val errorReader = BufferedReader(InputStreamReader(connection.errorStream ?: connection.inputStream))
+                    val errorReader = BufferedReader(
+                        InputStreamReader(connection.errorStream ?: connection.inputStream)
+                    )
                     val errorResponse = errorReader.readText()
                     errorReader.close()
 
@@ -178,7 +149,11 @@ object GeminiVisionService {
         return Base64.encodeToString(byteArray, Base64.NO_WRAP)
     }
 
-    private fun buildImagePrompt(subject: String, additionalContext: String, showSteps: Boolean): String {
+    private fun buildImagePrompt(
+        subject: String,
+        additionalContext: String,
+        showSteps: Boolean
+    ): String {
         val stepsInstruction = if (showSteps) {
             "Provide a detailed step-by-step solution. Explain each step clearly."
         } else {
@@ -211,7 +186,11 @@ object GeminiVisionService {
         """.trimIndent()
     }
 
-    private fun buildTextPrompt(question: String, subject: String, showSteps: Boolean): String {
+    private fun buildTextPrompt(
+        question: String,
+        subject: String,
+        showSteps: Boolean
+    ): String {
         val stepsInstruction = if (showSteps) {
             "Provide a detailed step-by-step solution. Explain each step clearly."
         } else {
