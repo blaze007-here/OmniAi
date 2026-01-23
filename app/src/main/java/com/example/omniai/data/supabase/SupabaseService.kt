@@ -10,7 +10,7 @@ import kotlinx.coroutines.withContext
 
 object SupabaseService {
     private const val SUPABASE_URL = "https://lhiziddurpovduccvieb.supabase.co"
-    private const val SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxoaXppZGR1cnBvdmR1Y2N2aWViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg2NTM1NjIsImV4cCI6MjA4NDIyOTU2Mn0.GLi1wegP8R1vBfcj_K5_-afdsbJHmDJYHVyENMc6Kik"
+    private const val SUPABASE_KEY = "API"// supabase api key here or annon keey
 
     val client = createSupabaseClient(
         supabaseUrl = SUPABASE_URL,
